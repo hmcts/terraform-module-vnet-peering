@@ -1,0 +1,80 @@
+name: terraform-vnet-peering
+trigger:
+  batch: true
+  branches:
+    include:
+      - master
+
+resources:
+  repositories:
+    - repository: cnp-azuredevops-libraries
+      type: github
+      ref: master
+      name: hmcts/cnp-azuredevops-libraries
+      endpoint: 'hmcts (1)'
+
+parameters:
+  - name: environment_components
+    displayName: Component to Run
+    type: object
+  - name: overrideAction
+    type: string
+    default: plan
+    values:
+      - plan
+      - apply
+      - destroy
+
+variables:
+  - name: tfversion
+    value: 1.0.11
+  - name: timeoutInMinutes
+    value: "60"
+  - name: agentPool
+    value: "ubuntu-latest"
+  - name: build
+    value: $(Build.BuildNumber)
+  - name: product
+    value: "peering"
+  - name: terraformInitSubscription
+    value: 04d27a32-7a07-48b3-95b8-3c8691e1a263
+  - template: vars/input-variables.yaml@cnp-azuredevops-libraries
+
+stages:
+  - stage: Precheck
+    jobs:
+      - job:
+        pool:
+          vmImage: ${{ variables.agentPool }}
+        timeoutInMinutes: ${{ variables.timeoutInMinutes }}
+        steps:
+          - template: steps/terraform-precheck.yaml@cnp-azuredevops-libraries
+            parameters:
+              keyvaultName: 'infra-vault-nonprod'
+              keyvaultSecret: 'azure-devops-token'
+              serviceConnection: 'DCD-CFT-Sandbox'
+              overrideAction: ${{ parameters.overrideAction }}
+
+  - ${{ each deployment in parameters.environment_components }}:
+      - stage: Infrastucture_${{ replace(deployment.location, ' ', '_') }}_${{ deployment.environment }}
+        displayName: Infrastucture_${{ replace(deployment.location, ' ', '_') }}_${{ deployment.environment }}
+        condition: succeeded()
+        jobs:
+          - job: TerraformPlanApply
+            pool:
+              vmImage: ${{ variables.agentPool }}
+            steps:
+              - template: steps/terraform.yaml@cnp-azuredevops-libraries
+                parameters:
+                  serviceConnection: "HMCTS-HUB-${{ upper(deployment.environment) }}-INTSVC"
+                  product: $(product)
+                  overrideAction: ${{ parameters.overrideAction }}
+                  environment: ${{ deployment.environment }}
+                  component: "infrastructure"
+                  terraformInitSubscription: ${{ variables.terraformInitSubscription }}
+                  initCommandOptions: >
+                    -reconfigure
+                    -backend-config resource_group_name=${{ deployment.resourceGroupName }}
+                  planCommandOptions: >
+                    -compact-warnings
+                    -lock-timeout=30s
