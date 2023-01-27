@@ -3,4 +3,4 @@ terraform-module-vnet-peering
 
 purpose 
 
-a module to allow peering of two vnets 
+a module for peering of vnets 
