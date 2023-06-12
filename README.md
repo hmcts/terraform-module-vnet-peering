@@ -3,7 +3,7 @@ This is a module to use when creating a peering between virtual networks (VNets)
  
 ## Usage 
 
-To use the peering module, it defines a VNet peering configuration and reuses it across different environments. This promotes code reuse, reduces duplication, and ensures consistent configuration across the infrastructure.
+To use the peering module, it defines a VNet [peering] (https://github.com/hmcts/aks-cft-deploy/blob/main/components/network/peering.tf)configuration and reuses it across different environments. This promotes code reuse, reduces duplication, and ensures consistent configuration across the infrastructure.
 # Example 
 
 The following example shows how to use module for peering vnets.
@@ -32,3 +32,6 @@ module "vnet_peer_hub_prod" {
 }
 ```
 
+
+# LICENSE
+This project is licensed under the MIT License - see the LICENSE file for details.
