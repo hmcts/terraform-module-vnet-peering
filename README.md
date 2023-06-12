@@ -1,19 +1,20 @@
 # terraform-module-vnet-peering
-terraform-module-vnet-peering
+This is a module to use when creating a peering between virtual networks (VNets). The idea is to have a centralised module that facilitates the VNets peering.
  
-A module for peering of vnets 
+## Usage 
+
+To use the peering module, it defines a VNet peering configuration and reuses it across different environments. This promotes code reuse, reduces duplication, and ensures consistent configuration across the infrastructure.
 # Example 
 
 The following example shows how to use module for peering vnets.
-
+```json
 module "vnet_peer_hub_prod" {
   source = "github.com/hmcts/terraform-module-vnet-peering"
 
-  for_each = toset([for r in local.regions : r if contains(local.hub_to_env_mapping["prod"], var.env)])
 
   peerings = {
     source = {
-      name           = (var.env == "ptl") || (var.env == "dev") ? "${local.hub["prod"][each.key].peering_name}-prod" : local.hub["prod"][each.key].peering_name
+      name           = "hub"
       vnet           = module.network.network_name
       resource_group = module.network.network_resource_group
     }
@@ -29,3 +30,5 @@ module "vnet_peer_hub_prod" {
     azurerm.target    = azurerm.hub-prod
   }
 }
+```
+
