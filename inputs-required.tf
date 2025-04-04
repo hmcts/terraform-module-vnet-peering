@@ -10,7 +10,7 @@ variable "peerings" {
     condition = alltrue([
       contains(keys(var.peerings), "source"),
       contains(keys(var.peerings), "target"),
-      [for k, v in var.peerings : (contains(keys(v), "vnet") && contains(keys(v), "resource_group")) || contains(keys(v), "vnet_id")]
+      alltrue([for k, v in var.peerings : (contains(keys(v), "vnet") && contains(keys(v), "resource_group")) || contains(keys(v), "vnet_id")])
     ])
     error_message = "Must contain exactly two keys, source and target."
   }
