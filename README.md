@@ -74,21 +74,26 @@ module "vnet_peer_cross_tenant_subnet" {
 
 Cross-tenant peering is supported by this module through aliased AzureRM providers. Each side of the peering must be authenticated with a provider that has the required access in that tenant/subscription.
 
-### Example: Cross-Tenant Full VNet Peering
+
+> **Note:** For cross-tenant operations, you must use the `auxiliary_tenant_ids` argument in your provider blocks. See the [official documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/authenticate-multi-tenant#header-values-for-authentication) for details.
+
+### Example: Cross-Tenant Full VNet Peering (with auxiliary_tenant_ids)
 
 ```hcl
-# Root module: configure two providers, each with different tenant/subscription
+# Root module: configure two providers, each with different tenant/subscription and auxiliary_tenant_ids
 provider "azurerm" {
-  alias           = "initiator"
-  subscription_id = var.source_subscription_id
-  tenant_id       = var.source_tenant_id
+  alias                = "initiator"
+  subscription_id      = var.source_subscription_id
+  tenant_id            = var.source_tenant_id
+  auxiliary_tenant_ids = [var.target_tenant_id]
   features {}
 }
 
 provider "azurerm" {
-  alias           = "target"
-  subscription_id = var.target_subscription_id
-  tenant_id       = var.target_tenant_id
+  alias                = "target"
+  subscription_id      = var.target_subscription_id
+  tenant_id            = var.target_tenant_id
+  auxiliary_tenant_ids = [var.source_tenant_id]
   features {}
 }
 
@@ -115,21 +120,23 @@ module "vnet_peer_cross_tenant" {
 }
 ```
 
-### Example: Cross-Tenant Subnet Peering
+### Example: Cross-Tenant Subnet Peering (with auxiliary_tenant_ids)
 
 ```hcl
-# Root module: configure two providers, each with different tenant/subscription
+# Root module: configure two providers, each with different tenant/subscription and auxiliary_tenant_ids
 provider "azurerm" {
-  alias           = "initiator"
-  subscription_id = var.source_subscription_id
-  tenant_id       = var.source_tenant_id
+  alias                = "initiator"
+  subscription_id      = var.source_subscription_id
+  tenant_id            = var.source_tenant_id
+  auxiliary_tenant_ids = [var.target_tenant_id]
   features {}
 }
 
 provider "azurerm" {
-  alias           = "target"
-  subscription_id = var.target_subscription_id
-  tenant_id       = var.target_tenant_id
+  alias                = "target"
+  subscription_id      = var.target_subscription_id
+  tenant_id            = var.target_tenant_id
+  auxiliary_tenant_ids = [var.source_tenant_id]
   features {}
 }
 
