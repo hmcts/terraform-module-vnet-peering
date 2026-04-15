@@ -8,6 +8,11 @@ variable "allow_forwarded_traffic" {
   default     = true
 }
 
+variable "peer_complete_virtual_networks_enabled" {
+  description = "Controls whether the complete virtual network address space is peered. Set to false to enable subnet peering for new peerings."
+  default     = true
+}
+
 variable "allow_gateway_transit" {
   description = "Controls gatewayLinks can be used in the remote virtual network’s link to the local virtual network"
   default     = false

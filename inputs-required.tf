@@ -4,6 +4,7 @@ variable "peerings" {
     resource_group = optional(string)
     vnet           = optional(string)
     vnet_id        = optional(string)
+    subnet_names   = optional(list(string), [])
   }))
   description = "Map of peerings to be created, must contain a source and target keys."
   validation {
